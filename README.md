@@ -1,2 +1,2 @@
 # DATA.310 Coursework
- Coursework for Artifical Intelligence course
+ Collection of various course exercises from 2022 Spring implementation of Artificial Intelligence course.
