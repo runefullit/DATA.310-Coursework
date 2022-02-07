@@ -141,7 +141,104 @@ def joint_probability(people, one_gene, two_genes, have_trait):
         * everyone in set `have_trait` has the trait, and
         * everyone not in set` have_trait` does not have the trait.
     """
-    raise NotImplementedError
+    p = 1
+    for person in people:
+        # We infer from example data that everyone either has 2 listed parents
+        # or none. Never only one. Therefore it's sufficient to just check the
+        # exstence of a mother connection.
+        #
+        # If no parents are found, using prioris probability, else solving for
+        # the probability of inheriting only one gene.
+        p *= geneProbability(people[person], one_gene, two_genes, have_trait) * \
+            traitProbability(people[person], one_gene, two_genes, have_trait)
+
+    return p
+
+
+def geneProbability(person, one_gene, two_genes, have_trait):
+    """
+    Compute the probability that a person has the amount of genes
+    given by inputs.
+    """
+
+    # When person's parents are unknown, using population data instead.
+    if person["mother"] == None:
+        if person["name"] in one_gene:
+            return PROBS["gene"][1]
+        elif person["name"] in two_genes:
+            return PROBS["gene"][2]
+        else:
+            return PROBS["gene"][0]
+
+    # When parents are known, calculating the probability of inheriting
+    # exactly the desired number of genes.
+    else:
+        mother = person["mother"]
+        father = person["father"]
+        mGenes = 0
+        fGenes = 0
+        sGenes = 0
+
+        if mother in one_gene: mGenes = 1
+        elif mother in two_genes: mGenes = 2
+
+        if father in one_gene: fGenes = 1
+        elif father in two_genes: fGenes = 2
+
+        if person["name"] in one_gene: sGenes = 1
+        elif person["name"] in two_genes: sGenes = 2
+
+        return inheritanceProbability(sGenes, fGenes, mGenes)
+
+            
+def inheritanceProbability(selfGeneCount, fatherGeneCount, motherGeneCount):
+    """
+    Compute and return the probability of inheriting exactly selfGeneCount genes.
+    Given that parents have fatherGeneCount and motherGeneCount of genes.
+    """
+    # Note that the probability of a single gene posessing parent passing
+    # on a gene becomes 0.5. The two alternatives, passing the gene and it not
+    # mutating, and not passing the gene, but it mutating form the probability
+    #
+    # p = PROBS["mutation"] * 0.5 + (1 - PROBS["mutation"]) * 0.5
+    #   = 0.5 * (PROBS["mutation"] + 1 - PROBS["mutation"])
+    #   = 0.5 * 1
+    #   = 0.5
+    propagationProbs = {
+        0: {
+            0: 1 - PROBS["mutation"],
+            1: PROBS["mutation"]
+        },
+        1: {
+            0: 0.5,
+            1: 0.5
+        },
+        2: {
+            0: PROBS["mutation"],
+            1: 1 - PROBS["mutation"]
+        }
+    }
+    if selfGeneCount == 2:
+        return propagationProbs[fatherGeneCount][1] * propagationProbs[motherGeneCount][1]
+    elif selfGeneCount == 1:
+        return propagationProbs[fatherGeneCount][1] * propagationProbs[motherGeneCount][0] + \
+            propagationProbs[fatherGeneCount][0] * propagationProbs[motherGeneCount][1]
+    else:
+        return propagationProbs[fatherGeneCount][0] * propagationProbs[motherGeneCount][0]
+
+
+def traitProbability(person, one_gene, two_genes, have_trait):
+    """
+    Compute and return the probability that the person's trait status
+    is as presented by presence or absence from the have_trait set.
+    """
+    g = 0
+    t = False
+    if person["name"] in one_gene: g = 1
+    elif person["name"] in two_genes: g = 2
+    if person["name"] in have_trait: t = True
+    
+    return PROBS["trait"][g][t]
 
 
 def update(probabilities, one_gene, two_genes, have_trait, p):
@@ -151,7 +248,19 @@ def update(probabilities, one_gene, two_genes, have_trait, p):
     Which value for each distribution is updated depends on whether
     the person is in `have_gene` and `have_trait`, respectively.
     """
-    raise NotImplementedError
+    for person in probabilities:
+        if person in one_gene:
+            probabilities[person]["gene"][1] += p
+        elif person in two_genes:
+            probabilities[person]["gene"][2] += p
+        else:
+            probabilities[person]["gene"][0] += p
+
+        if person in have_trait:
+            probabilities[person]["trait"][True] += p
+        else:
+            probabilities[person]["trait"][False] += p
+
 
 
 def normalize(probabilities):
@@ -159,7 +268,15 @@ def normalize(probabilities):
     Update `probabilities` such that each probability distribution
     is normalized (i.e., sums to 1, with relative proportions the same).
     """
-    raise NotImplementedError
+    for person in probabilities:
+        probabilities[person]["gene"] = {
+            g: probabilities[person]["gene"][g] / sum(probabilities[person]["gene"].values())
+            for g in probabilities[person]["gene"]
+        }
+        probabilities[person]["trait"] = {
+            t: probabilities[person]["trait"][t] / sum(probabilities[person]["trait"].values())
+            for t in probabilities[person]["trait"]
+        }
 
 
 if __name__ == "__main__":
