@@ -16,7 +16,10 @@ V -> "smiled" | "tell" | "were"
 """
 
 NONTERMINALS = """
-S -> N V 
+S -> NP VP
+NP -> N | Adj NP | Det N | Det Adj NP | N NP | Adv | Adv NP | Conj S | Conj VP | PP
+VP -> V | V NP | V NP PP | V PP
+PP -> P NP
 """
 
 grammar = nltk.CFG.fromstring(NONTERMINALS + TERMINALS)
@@ -63,7 +66,13 @@ def preprocess(sentence):
     and removing any word that does not contain at least one alphabetic
     character.
     """
-    raise NotImplementedError
+    # First sentence is converted to lowercase and the words are split into
+    # a list on any whitespace markers. Then that list is filtered. The lambda
+    # function used as the filtering conditions checks every letter of a given
+    # word and produces a logical array telling whether or not the characters are
+    # alphabetic. A non-zero sum tells us that the word has at least one alphabet.
+    return list(filter(lambda w: sum([c.isalpha() for c in w]) != 0,
+        nltk.word_tokenize(sentence.lower())))
 
 
 def np_chunk(tree):
@@ -73,7 +82,7 @@ def np_chunk(tree):
     whose label is "NP" that does not itself contain any other
     noun phrases as subtrees.
     """
-    raise NotImplementedError
+    # Thinking recursive solution maybe? Refer to https://www.nltk.org/api/nltk.tree.tree.html
 
 
 if __name__ == "__main__":

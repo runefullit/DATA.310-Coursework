@@ -1,0 +1,13 @@
+ 1. Holmes sat. 							-> N V
+ 2. Holmes lit a pipe. 							-> N V Det N
+ 3. We arrived the day before Thursday. 				-> N V Det N P N
+ 4. Holmes sat in the red armchair and he chuckled. 			-> N V P Det Adj N Conj N V
+ 5. My companion smiled an enigmatical smile. 				-> Det N V Det Adj N
+ 6. Holmes chuckled to himself. 					-> N V P N
+ 7. She never said a word until we were at the door here. 		-> N Adv V Det N Conj N V P Det N Adv
+ 8. Holmes sat down and lit his pipe.					-> N V Adv Conj V Det N
+ 9. I had a country walk on Thursday and came home in a dreadful mess.	-> N V Det Adj N P N Conj V N P Det Adj N
+10. I had a little moist red paint in the palm of my hand.		-> N V Det Adj Adj Adj N P Det N P Det N
+
+(S
+  
