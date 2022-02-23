@@ -27,7 +27,7 @@ def super_strip(input_string):
 
     return " ".join(output_string)
 
-def get_Ngrams(text, N):
+def get_Ngrams(text, N, startstop=True):
     """Return characterwise n-gram of size N."""
 
     # Checking inputs
@@ -39,7 +39,8 @@ def get_Ngrams(text, N):
         raise NonpositiveNGramLengthException("N must be positive")
 
     # Adding end and beginning symbols
-    text = "".join(['[', text, ']'])
+    if startstop:
+        text = "".join(['[', text, ']'])
     nGrams = dict()
     # Must cut the loop short by N-1 iterations
     for i in range(len(text)-(N-1)):
@@ -47,26 +48,36 @@ def get_Ngrams(text, N):
         if seq not in nGrams:
             nGrams[seq] = 0
         nGrams[seq] += 1
+    # Get sum of vals
+    valsum = sum(nGrams.values())
+    nGrams  = {k: v/valsum for k, v in nGrams.items()}
     return nGrams
 
 def proba(test_phrase, nGrams):
     """Return the probability of the test phrase existing given learned nGrams"""
     # Getting the length of the first element to pass info of what N is.
     N = len(list(nGrams.keys())[0])
-    n = len(nGrams)
     prob = 1
     for i in range(len(test_phrase) - (N-1)):
         seq = test_phrase[i:i+N]
-        prob *= nGrams[seq]/n # Probability of the sequence
+        prob *= nGrams[seq]
     return prob
 
 def main():
     contents = filtered_read("TheStoryofAnHour-KateChopin.txt")
-    nGrams = get_Ngrams(contents, 2)
     test_phrase = 'no one'
+    
+    # With start and stop markers added
+    nGrams = get_Ngrams(contents, 2)
     prob = proba(test_phrase, nGrams)
-    print(prob)
-    print(int("".join(str(prob)[:4].split('.')))%173)
+    rem = int("".join(str(prob)[:4].split('.'))) % 173
+    print(f"Remainder with start and stop markers: {rem}")
+
+    # Without start and stop markers
+    nGrams = get_Ngrams(contents, 2, startstop=False)
+    prob = proba(test_phrase, nGrams)
+    rem = int("".join(str(prob)[:4].split('.')))%173
+    print(f"Remainder without start and stop markers: {rem}")
 
 
 if __name__ == "__main__":
