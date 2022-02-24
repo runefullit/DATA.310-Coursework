@@ -16,27 +16,11 @@ V -> "arrived" | "came" | "chuckled" | "had" | "lit" | "said" | "sat"
 V -> "smiled" | "tell" | "were"
 """
 
-# This is my original attempt. It suffered from more ambiguity. Also several
-# Definitions that recurred back to defining a single noun as NP caused issues
-# with finding correct noun phrases. The noun alone got picked up while any
-# words modifying it belonged to a higher noun phrase.
 NONTERMINALS = """
 S -> NP VP
 NP -> N | Adj NP | Det N | Det Adj NP | N NP | Adv | Adv NP | Conj S | Conj VP | PP
 VP -> V | V NP | V NP PP | V PP
 PP -> P NP
-"""
-
-# This is the version of non-terminals that I'm trying to backwards engineer from
-# the grader outputs.
-NONTERMINALS = """
-S -> S T | NP Vd | S Conj Sd | Vd T
-T -> NP | PNP | Adv
-NP -> Det Nd | NP PNP | N
-PNP -> P NP
-Nd -> N | Adj N
-Vd -> V | Adv V
-Sd -> S
 """
 
 grammar = nltk.CFG.fromstring(NONTERMINALS + TERMINALS)

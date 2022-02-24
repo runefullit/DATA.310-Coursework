@@ -8,6 +8,4 @@
  8. Holmes sat down and lit his pipe.					-> N V Adv Conj V Det N
  9. I had a country walk on Thursday and came home in a dreadful mess.	-> N V Det Adj N P N Conj V N P Det Adj N
 10. I had a little moist red paint in the palm of my hand.		-> N V Det Adj Adj Adj N P Det N P Det N
-
-(S
   
