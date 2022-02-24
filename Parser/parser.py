@@ -1,3 +1,4 @@
+from queue import Empty
 import nltk
 import sys
 import re
@@ -83,6 +84,14 @@ def np_chunk(tree):
     noun phrases as subtrees.
     """
     # Thinking recursive solution maybe? Refer to https://www.nltk.org/api/nltk.tree.tree.html
+    np_chunks = list()
+    for subtree in tree:
+        # This passes as long as subtree isn't a terminal node.
+        if isinstance(subtree, type(tree)):
+            np_chunks += np_chunk(subtree)
+            if (len(np_chunks) == 0) & (subtree.label() == 'NP'):
+                np_chunks.append(subtree)
+    return np_chunks       
 
 
 if __name__ == "__main__":
