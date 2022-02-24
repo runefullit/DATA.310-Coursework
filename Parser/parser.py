@@ -1,7 +1,5 @@
-from queue import Empty
 import nltk
 import sys
-import re
 
 TERMINALS = """
 Adj -> "country" | "dreadful" | "enigmatical" | "little" | "moist" | "red"
@@ -18,7 +16,7 @@ V -> "smiled" | "tell" | "were"
 
 # This is my original attempt. It suffered from more ambiguity. Also several
 # Definitions that recurred back to defining a single noun as NP caused issues
-# with finding correct noun phrases. The noun alone got picked up while any
+# with finding correct noun phrases. The noun alone got picked up wWhile any
 # words modifying it belonged to a higher noun phrase.
 NONTERMINALS = """
 S -> NP VP
