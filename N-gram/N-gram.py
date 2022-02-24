@@ -8,7 +8,7 @@ class NonpositiveNGramLengthException(Exception):
     pass
 
 def filtered_read(fname):
-    fpath = "\\".join([path.dirname(path.abspath(__file__)), fname])
+    fpath = "/".join([path.dirname(path.abspath(__file__)), fname])
     contents = open(fpath, "r").read()
     return super_strip(contents)
 
@@ -27,31 +27,46 @@ def super_strip(input_string):
 
     return " ".join(output_string)
 
-def get_Ngrams(text, N, startstop=True):
-    """Return characterwise n-gram of size N."""
+# def get_Ngrams(text, N, startstop=True):
+#     """Return characterwise n-gram of size N."""
 
-    # Checking inputs
-    if not isinstance(N, type(int())):
-        raise TypeError("N must be an integer")
-    if not isinstance(text, type(str())):
-        raise TypeError("First parameter must be a string")
-    if N <= 0:
-        raise NonpositiveNGramLengthException("N must be positive")
+#     # Checking inputs
+#     if not isinstance(N, type(int())):
+#         raise TypeError("N must be an integer")
+#     if not isinstance(text, type(str())):
+#         raise TypeError("First parameter must be a string")
+#     if N <= 0:
+#         raise NonpositiveNGramLengthException("N must be positive")
 
-    # Adding end and beginning symbols
-    if startstop:
-        text = "".join(['[', text, ']'])
+#     # Adding end and beginning symbols
+#     if startstop:
+#         text = "".join(['[', text, ']'])
+#     nGrams = dict()
+#     # Must cut the loop short by N-1 iterations
+#     for i in range(len(text)-(N-1)):
+#         seq = text[i:i+N]
+#         if seq not in nGrams:
+#             nGrams[seq] = 0
+#         nGrams[seq] += 1
+#     # Get sum of vals
+#     valsum = sum(nGrams.values())
+#     nGrams  = {k: v/valsum for k, v in nGrams.items()}
+#     return nGrams
+
+
+def get_Ngrams(words, N):
+    '''Return word-wise n-gram of size N'''
+    words = ['['].append(words).append(']')
     nGrams = dict()
-    # Must cut the loop short by N-1 iterations
-    for i in range(len(text)-(N-1)):
-        seq = text[i:i+N]
+    for i in range(len(words) - (N-1)):
+        seq = tuple(words[i:i+N])
         if seq not in nGrams:
             nGrams[seq] = 0
         nGrams[seq] += 1
-    # Get sum of vals
     valsum = sum(nGrams.values())
-    nGrams  = {k: v/valsum for k, v in nGrams.items()}
+    nGrams = {k: v/valsum for k, v in nGrams.items()} # Normalize to probabilities.
     return nGrams
+
 
 def proba(test_phrase, nGrams):
     """Return the probability of the test phrase existing given learned nGrams"""
@@ -66,18 +81,21 @@ def proba(test_phrase, nGrams):
 def main():
     contents = filtered_read("TheStoryofAnHour-KateChopin.txt")
     test_phrase = 'no one'
-    
-    # With start and stop markers added
-    nGrams = get_Ngrams(contents, 2)
-    prob = proba(test_phrase, nGrams)
-    rem = int("".join(str(prob)[:4].split('.'))) % 173
-    print(f"Remainder with start and stop markers: {rem}")
 
-    # Without start and stop markers
-    nGrams = get_Ngrams(contents, 2, startstop=False)
-    prob = proba(test_phrase, nGrams)
-    rem = int("".join(str(prob)[:4].split('.')))%173
-    print(f"Remainder without start and stop markers: {rem}")
+    nGrams = get_Ngrams(contents.split(), 2)
+    print(nGrams[:10])
+    
+    # # With start and stop markers added
+    # nGrams = get_Ngrams(contents, 2)
+    # prob = proba(test_phrase, nGrams)
+    # rem = int("".join(str(prob)[:4].split('.'))) % 173
+    # print(f"Remainder with start and stop markers: {rem}")
+
+    # # Without start and stop markers
+    # nGrams = get_Ngrams(contents, 2, startstop=False)
+    # prob = proba(test_phrase, nGrams)
+    # rem = int("".join(str(prob)[:4].split('.')))%173
+    # print(f"Remainder without start and stop markers: {rem}")
 
 
 if __name__ == "__main__":
