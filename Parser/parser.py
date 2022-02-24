@@ -99,14 +99,23 @@ def np_chunk(tree):
     whose label is "NP" that does not itself contain any other
     noun phrases as subtrees.
     """
-    # Thinking recursive solution maybe? Refer to https://www.nltk.org/api/nltk.tree.tree.html
+    # Using Depth first search to find NP chunks in the same order
+    # as they read.
     np_chunks = list()
     for subtree in tree:
-        # This passes as long as subtree isn't a terminal node.
+        # This is false if we're at terminal node.
         if isinstance(subtree, type(tree)):
-            np_chunks += np_chunk(subtree)
-            if (len(np_chunks) == 0) & (subtree.label() == 'NP'):
+            # Finding np_chunks in the examined subtree.
+            sub_np_chunks = np_chunk(subtree)
+
+            # If none found, and currently at NP, add current.
+            if (len(sub_np_chunks) == 0) & (subtree.label() == 'NP'):
                 np_chunks.append(subtree)
+
+            # Any NP chunk found at this, or lower level is added to np_chunks.
+            # Grammar here doesn't allow a tree that would have multiple NP subtrees,
+            # but this solution should work even if that grammar was to change.
+            np_chunks += sub_np_chunks
     return np_chunks       
 
 
